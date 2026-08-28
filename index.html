@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adael Vega — Estudiante de Ingeniería en Sistemas | Python &amp; Scripting</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          display: ['Syne', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  :root{ --mx:50%; --my:50%; }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; scroll-padding-top:120px; }
+  body{ background:#000; color:#fff; overflow-x:hidden; }
+  ::selection{ background:#fff; color:#000; }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-track{ background:#000; }
+  ::-webkit-scrollbar-thumb{ background:#242424; border-radius:4px; }
+  ::-webkit-scrollbar-thumb:hover{ background:#3a3a3a; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid #fff; outline-offset:4px; border-radius:2px;
+  }
+
+  /* ---------- background grid ---------- */
+  .bg-grid{
+    background-image:
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* ---------- spotlight ---------- */
+  #spotlight{
+    position:fixed; inset:0; pointer-events:none; z-index:2;
+    background: radial-gradient(600px circle at var(--mx) var(--my), rgba(255,255,255,0.06), transparent 40%);
+  }
+
+  /* ---------- custom cursor ---------- */
+  html.has-cursor, html.has-cursor *{ cursor:none !important; }
+  #cursor-dot{
+    position:fixed; top:0; left:0; width:6px; height:6px; background:#fff; border-radius:50%;
+    pointer-events:none; z-index:9999; transform:translate(-50%,-50%);
+  }
+  #cursor-ring{
+    position:fixed; top:0; left:0; width:32px; height:32px; border:1px solid rgba(255,255,255,0.45);
+    border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%);
+    transition:width .25s ease, height .25s ease, border-color .25s ease, background-color .25s ease;
+  }
+  body.cursor-hover #cursor-ring{ width:56px; height:56px; border-color:#fff; background:rgba(255,255,255,0.08); }
+
+  /* ---------- preloader ---------- */
+  #preloader{
+    position:fixed; inset:0; background:#000; z-index:10000;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.75rem;
+    transition: transform .9s cubic-bezier(.76,0,.24,1), opacity .9s cubic-bezier(.76,0,.24,1);
+  }
+  #preloader.loaded{ transform:translateY(-100%); opacity:0.5; pointer-events:none; }
+  .loader-percent{
+    font-family:'Syne',sans-serif; font-weight:800; letter-spacing:-0.03em; line-height:1;
+    font-size:clamp(3.5rem,13vw,8rem);
+  }
+  .loader-bar-track{ width:min(320px,70vw); height:2px; background:rgba(255,255,255,.12); }
+  .loader-bar-fill{ height:100%; width:0%; background:#fff; transition:width .12s linear; }
+  .loader-status{ font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.2em; color:rgba(255,255,255,.5); transition:opacity .25s ease; min-height:1em; }
+
+  /* ---------- reveal on scroll ---------- */
+  .reveal{ opacity:0; transform:translateY(36px); transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); }
+  .reveal.in-view{ opacity:1; transform:translateY(0); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+    html{ scroll-behavior:auto; }
+    #spotlight, #cursor-dot, #cursor-ring{ display:none !important; }
+    html.has-cursor, html.has-cursor *{ cursor:auto !important; }
+    .reveal{ opacity:1 !important; transform:none !important; }
+  }
+
+  /* ---------- caret ---------- */
+  .caret{ display:inline-block; width:.46em; background:#fff; margin-left:.08em; animation:blink 1s steps(1) infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  /* ---------- nav ---------- */
+  .nav-link{ position:relative; }
+  .nav-link::after{
+    content:''; position:absolute; left:0; bottom:-6px; width:0; height:1px; background:#fff;
+    transition:width .35s cubic-bezier(.16,1,.3,1);
+  }
+  .nav-link:hover::after, .nav-link.active::after{ width:100%; }
+
+  /* ---------- buttons ---------- */
+  .btn-fill{ position:relative; z-index:0; overflow:hidden; }
+  .btn-fill::before{
+    content:''; position:absolute; inset:0; background:#fff; transform:scaleX(0); transform-origin:left;
+    transition:transform .5s cubic-bezier(.76,0,.24,1); z-index:-1;
+  }
+  .btn-fill:hover::before{ transform:scaleX(1); }
+  .btn-fill:hover{ color:#000; }
+
+  .btn-outline{ position:relative; z-index:0; overflow:hidden; }
+  .btn-outline::before{
+    content:''; position:absolute; inset:0; background:#fff; transform:scaleX(0); transform-origin:left;
+    transition:transform .5s cubic-bezier(.76,0,.24,1); z-index:-1;
+  }
+  .btn-outline:hover::before{ transform:scaleX(1); }
+  .btn-outline:hover{ color:#000; }
+
+  /* ---------- marquee ---------- */
+  .marquee{ overflow:hidden; }
+  .marquee-track{ display:flex; width:max-content; animation:marquee 30s linear infinite; }
+  .marquee:hover .marquee-track{ animation-play-state:paused; }
+  @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+
+  /* ---------- scroll cue ---------- */
+  @keyframes scrolldown{ 0%{ transform:translateY(-100%); } 100%{ transform:translateY(500%); } }
+
+  /* ---------- pulse dot ---------- */
+  .pulse-wrap{ position:relative; }
+  .pulse-wrap::after{
+    content:''; position:absolute; inset:0; border-radius:50%; background:#fff;
+    animation:pulse 1.8s ease-out infinite;
+  }
+  @keyframes pulse{ 0%{ transform:scale(1); opacity:.6; } 100%{ transform:scale(2.6); opacity:0; } }
+
+  /* ---------- terminal pixel blink ---------- */
+  .pixel{ animation:pixelPulse 3.2s ease-in-out infinite; animation-delay:calc(var(--i) * .12s); }
+  @keyframes pixelPulse{ 0%,100%{ opacity:.08; } 50%{ opacity:.55; } }
+
+  /* ---------- form inputs ---------- */
+  .field-input{
+    background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,.2);
+    padding:.75rem .1rem; width:100%; color:#fff; transition:border-color .4s ease;
+  }
+  .field-input::placeholder{ color:rgba(255,255,255,.35); }
+  .field-input:focus{ outline:none; border-color:#fff; }
+
+  /* ---------- bento cards ---------- */
+  .bento-card{
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.02);
+    backdrop-filter: blur(6px);
+    transition: border-color .4s ease, background-color .4s ease, transform .4s ease;
+  }
+  .bento-card:hover{ border-color:rgba(255,255,255,.28); background:rgba(255,255,255,.04); transform:translateY(-3px); }
+
+  /* ---------- terminal widget ---------- */
+  #terminal-window{
+    background:#0a0a0a;
+    border:1px solid #ffffff22;
+    border-radius:14px;
+    font-family:'JetBrains Mono', monospace;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,.9);
+  }
+  #terminal-titlebar{
+    border-bottom:1px solid #ffffff14;
+  }
+  .term-dot{ width:10px; height:10px; border-radius:50%; border:1px solid #ffffff33; }
+  #terminal-body{
+    height:min(60vh, 420px);
+    overflow-y:auto;
+    scrollbar-width:thin;
+  }
+  #terminal-body::-webkit-scrollbar{ width:6px; }
+  #terminal-body::-webkit-scrollbar-thumb{ background:#2a2a2a; border-radius:3px; }
+  .term-line{ white-space:pre-wrap; word-break:break-word; line-height:1.65; }
+  .term-prompt{ color:#ffffff; }
+  .term-path{ color:#ffffff80; }
+  .term-out{ color:#ffffffb3; }
+  .term-dim{ color:#ffffff55; }
+  .term-cursor{
+    display:inline-block; width:.55em; height:1.1em; background:#fff; vertical-align:text-bottom;
+    animation:blink 1s steps(1) infinite; margin-left:2px;
+  }
+  #terminal-input{
+    background:transparent; border:none; outline:none; color:#fff; caret-color:#fff;
+    font-family:'JetBrains Mono', monospace; width:100%;
+  }
+</style>
+</head>
+
+<body class="bg-black text-white font-sans antialiased">
+
+  <!-- ================= PRELOADER ================= -->
+  <div id="preloader">
+    <div class="font-mono text-[11px] tracking-[0.3em] text-white/40">AV — SISTEMA DE CARGA</div>
+    <div id="loader-percent" class="loader-percent">0%</div>
+    <div class="loader-bar-track"><div id="loader-bar-fill" class="loader-bar-fill"></div></div>
+    <div id="loader-status" class="loader-status">Inicializando entorno...</div>
+  </div>
+
+  <!-- ================= FX LAYERS ================= -->
+  <div id="spotlight"></div>
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- ================= NAV ================= -->
+  <header class="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-5 md:px-10 py-5 md:py-6 pointer-events-none">
+    <a href="#home" class="pointer-events-auto font-display font-bold text-base md:text-lg tracking-tight">
+      AV<span class="text-white/30">.</span>
+    </a>
+
+    <nav class="pointer-events-auto absolute left-1/2 -translate-x-1/2 top-4 md:top-6 flex items-center gap-5 md:gap-10 bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-full px-5 md:px-8 py-2.5 md:py-3">
+      <a href="#home" class="nav-link active font-mono text-[10px] md:text-xs tracking-[0.15em] text-white transition-colors duration-300">HOME</a>
+      <a href="#about" class="nav-link font-mono text-[10px] md:text-xs tracking-[0.15em] text-white/50 hover:text-white transition-colors duration-300">ABOUT ME</a>
+      <a href="#terminal" class="nav-link font-mono text-[10px] md:text-xs tracking-[0.15em] text-white/50 hover:text-white transition-colors duration-300">TERMINAL</a>
+      <a href="#contacto" class="nav-link font-mono text-[10px] md:text-xs tracking-[0.15em] text-white/50 hover:text-white transition-colors duration-300">CONTACTO</a>
+    </nav>
+
+    <div class="pointer-events-auto hidden sm:flex items-center gap-2 font-mono text-[10px] tracking-[0.2em] text-white/50">
+      <span class="pulse-wrap w-1.5 h-1.5 bg-white rounded-full"></span> DISPONIBLE
+    </div>
+  </header>
+
+  <main>
+    <!-- ================= HOME ================= -->
+    <section id="home" class="relative min-h-screen flex flex-col justify-center px-6 md:px-12 pt-32 pb-16 bg-grid">
+      <div class="max-w-6xl mx-auto w-full">
+        <div class="reveal font-mono text-[11px] md:text-sm tracking-[0.35em] text-white/50 mb-6" data-delay="0">
+          // PORTFOLIO — 2026
+        </div>
+
+        <h1 class="reveal font-display font-extrabold text-[clamp(2.6rem,9vw,7.5rem)] leading-[0.94] tracking-tight" data-delay="80">
+          Adael Vega<br>
+          <span class="text-white/25">Python &amp; Scripting<span class="caret">&nbsp;</span></span>
+        </h1>
+
+        <p class="reveal mt-8 max-w-xl text-white/60 text-base md:text-lg leading-relaxed font-light" data-delay="180">
+          Estudiante de Ingeniería en Sistemas. Apasionado por la automatización de procesos, el desarrollo de
+          scripts en Python, la administración de sistemas y el análisis de infraestructura de redes.
+        </p>
+
+        <div class="reveal mt-10 flex flex-wrap gap-4" data-delay="280">
+          <a href="#terminal" class="btn-fill inline-flex items-center gap-2 border border-white px-7 py-3.5 text-sm font-medium tracking-wide transition-colors duration-500">
+            Abrir terminal <span aria-hidden="true">›_</span>
+          </a>
+          <a href="#contacto" class="inline-flex items-center gap-2 border border-white/20 px-7 py-3.5 text-sm font-medium tracking-wide text-white/70 hover:text-white hover:border-white transition-all duration-500">
+            Hablemos
+          </a>
+        </div>
+      </div>
+
+      <!-- marquee -->
+      <div class="reveal marquee mt-20 md:mt-24 border-t border-b border-white/10 py-5" data-delay="0">
+        <div class="marquee-track gap-10 font-mono text-xs md:text-sm tracking-[0.2em] text-white/40">
+          <span class="flex items-center gap-10 pr-10">
+            <span>PYTHON</span><span>✦</span><span>LINUX</span><span>✦</span><span>BASH</span><span>✦</span>
+            <span>POWERSHELL</span><span>✦</span><span>REDES</span><span>✦</span><span>AUTOMATIZACIÓN</span><span>✦</span>
+            <span>GIT</span><span>✦</span><span>SCRIPTING</span><span>✦</span>
+          </span>
+          <span class="flex items-center gap-10 pr-10" aria-hidden="true">
+            <span>PYTHON</span><span>✦</span><span>LINUX</span><span>✦</span><span>BASH</span><span>✦</span>
+            <span>POWERSHELL</span><span>✦</span><span>REDES</span><span>✦</span><span>AUTOMATIZACIÓN</span><span>✦</span>
+            <span>GIT</span><span>✦</span><span>SCRIPTING</span><span>✦</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex flex-col items-center gap-3 absolute right-10 bottom-8 text-white/30">
+        <span class="font-mono text-[10px] tracking-[0.3em] [writing-mode:vertical-rl]">SCROLL</span>
+        <span class="w-px h-16 bg-white/15 relative overflow-hidden block">
+          <span class="absolute top-0 left-0 w-full h-4 bg-white" style="animation:scrolldown 1.8s ease-in-out infinite;"></span>
+        </span>
+      </div>
+    </section>
+
+    <!-- ================= ABOUT (BENTO GRID) ================= -->
+    <section id="about" class="relative px-6 md:px-12 py-28 md:py-36 border-t border-white/10">
+      <div class="max-w-6xl mx-auto">
+        <div class="reveal font-mono text-[11px] md:text-sm tracking-[0.35em] text-white/50 mb-6">// 02 — SOBRE MÍ</div>
+        <h2 class="reveal font-display font-extrabold text-[clamp(2rem,5.5vw,4rem)] leading-[1.02] tracking-tight max-w-3xl mb-14 md:mb-16">
+          Sistemas que aprenden,<br class="hidden md:block"> procesos que se automatizan.
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:auto-rows-[170px]">
+
+          <!-- bio / perfil -->
+          <div class="reveal bento-card md:col-span-2 md:row-span-2 rounded-2xl p-8 flex flex-col justify-between">
+            <p class="text-white/80 text-lg md:text-2xl font-display font-semibold leading-snug">
+              Creo que la mejor automatización es la que desaparece: la que elimina la tarea repetitiva antes de que alguien la note.
+            </p>
+            <p class="text-white/50 text-sm leading-relaxed mt-6 max-w-md">
+              Apasionado por la automatización de procesos, el desarrollo de scripts en Python, la administración
+              de sistemas y el análisis de infraestructura de redes.
+            </p>
+          </div>
+
+          <!-- formación -->
+          <div class="reveal bento-card md:col-span-2 rounded-2xl p-8 flex flex-col justify-center gap-2">
+            <div class="font-mono text-[10px] tracking-[0.15em] text-white/40">FORMACIÓN</div>
+            <div class="font-display font-extrabold text-2xl md:text-3xl leading-tight">Estudiante de Ingeniería<br>en Sistemas</div>
+          </div>
+
+          <!-- enfoque actual -->
+          <div class="reveal bento-card rounded-2xl p-7 flex flex-col justify-between">
+            <div class="flex items-center gap-2">
+              <span class="pulse-wrap w-1.5 h-1.5 bg-white rounded-full"></span>
+              <span class="font-mono text-[10px] tracking-[0.15em] text-white/50">ENFOQUE ACTUAL</span>
+            </div>
+            <p class="text-white/70 text-sm leading-relaxed mt-4">
+              Optimización de procesos, creación de scripts para tareas del sistema operativo y aprendizaje
+              autodidacta continuo.
+            </p>
+          </div>
+
+          <!-- quote -->
+          <div class="reveal bento-card rounded-2xl p-7 flex items-center">
+            <p class="font-display font-semibold text-white/80 text-base leading-snug">
+              “Un buen script no ejecuta una tarea: la elimina para siempre.”
+            </p>
+          </div>
+
+          <!-- stack técnico / terminal stack -->
+          <div class="reveal bento-card md:col-span-2 rounded-2xl p-7">
+            <div class="font-mono text-[10px] tracking-[0.15em] text-white/40 mb-4">TERMINAL STACK</div>
+            <div class="flex flex-wrap gap-2 font-mono">
+              <span class="border border-white/15 rounded-full px-3 py-1.5 text-xs text-white/70">Python — Intermedio / Automatización</span>
+              <span class="border border-white/15 rounded-full px-3 py-1.5 text-xs text-white/70">Linux (Bash)</span>
+              <span class="border border-white/15 rounded-full px-3 py-1.5 text-xs text-white/70">PowerShell</span>
+              <span class="border border-white/15 rounded-full px-3 py-1.5 text-xs text-white/70">Redes &amp; Protocolos de Comunicación</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TERMINAL / CONSOLE WIDGET ================= -->
+    <section id="terminal" class="relative px-6 md:px-12 py-28 md:py-36 border-t border-white/10 bg-grid">
+      <div class="max-w-4xl mx-auto">
+        <div class="reveal font-mono text-[11px] md:text-sm tracking-[0.35em] text-white/50 mb-6">// 03 — TERMINAL</div>
+        <h2 class="reveal font-display font-extrabold text-[clamp(2rem,5.5vw,4rem)] leading-[1.02] tracking-tight max-w-2xl mb-6">
+          Escríbelo,<br class="hidden md:block"> no lo hagas a mano.
+        </h2>
+        <p class="reveal text-white/50 text-sm md:text-base mb-10 max-w-lg">
+          Consola interactiva. Escribe <span class="text-white/80 font-mono">help</span> para ver los comandos disponibles.
+        </p>
+
+        <div id="terminal-window" class="reveal">
+          <div id="terminal-titlebar" class="flex items-center gap-2 px-4 py-3">
+            <span class="term-dot"></span>
+            <span class="term-dot"></span>
+            <span class="term-dot"></span>
+            <span class="ml-3 text-[11px] text-white/40 tracking-wide">adael@sistemas: ~</span>
+          </div>
+          <div id="terminal-body" class="px-4 md:px-5 py-4 text-[13px] md:text-sm" role="log" aria-live="polite"></div>
+          <div class="flex items-center gap-2 px-4 md:px-5 pb-4 text-[13px] md:text-sm">
+            <span class="term-prompt">adael@sistemas</span><span class="term-path">:~$</span>
+            <input id="terminal-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Comando de terminal">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CONTACTO ================= -->
+    <section id="contacto" class="relative px-6 md:px-12 py-28 md:py-36 border-t border-white/10">
+      <div class="max-w-6xl mx-auto">
+        <div class="reveal font-mono text-[11px] md:text-sm tracking-[0.35em] text-white/50 mb-6">// 04 — CONTACTO</div>
+        <h2 class="reveal font-display font-extrabold text-[clamp(2rem,5.5vw,4rem)] leading-[1.02] tracking-tight max-w-3xl mb-14 md:mb-16">
+          Hablemos de tu<br class="hidden md:block"> próximo proceso a automatizar.
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-12 md:gap-16">
+
+          <!-- form -->
+          <form id="contact-form" class="reveal md:col-span-3 flex flex-col gap-8" novalidate>
+            <div>
+              <label for="name" class="font-mono text-[10px] tracking-[0.15em] text-white/40">NOMBRE</label>
+              <input id="name" name="name" type="text" required placeholder="¿Cómo te llamas?" class="field-input font-display text-lg mt-2">
+            </div>
+            <div>
+              <label for="email" class="font-mono text-[10px] tracking-[0.15em] text-white/40">EMAIL</label>
+              <input id="email" name="email" type="email" required placeholder="tú@empresa.com" class="field-input font-display text-lg mt-2">
+            </div>
+            <div>
+              <label for="message" class="font-mono text-[10px] tracking-[0.15em] text-white/40">MENSAJE</label>
+              <textarea id="message" name="message" rows="4" required placeholder="Cuéntame sobre tu proyecto o idea..." class="field-input font-display text-lg mt-2 resize-none"></textarea>
+            </div>
+            <button id="submit-btn" type="submit" class="btn-fill self-start mt-2 inline-flex items-center gap-2 border border-white px-8 py-4 text-sm font-medium tracking-wide transition-colors duration-500">
+              Enviar mensaje <span aria-hidden="true">↗</span>
+            </button>
+          </form>
+
+          <!-- direct + social -->
+          <div class="reveal md:col-span-2 flex flex-col justify-between gap-12">
+            <div>
+              <div class="font-mono text-[10px] tracking-[0.15em] text-white/40 mb-3">CONTACTO DIRECTO</div>
+              <a href="mailto:adael.vega@example.com" class="font-display font-semibold text-xl md:text-2xl hover:text-white/60 transition-colors duration-300 break-all">adael.vega@example.com</a>
+              <p class="text-white/40 text-sm mt-3">Estudiante de Ingeniería en Sistemas · Disponible para prácticas y colaboraciones</p>
+            </div>
+
+            <div>
+              <div class="font-mono text-[10px] tracking-[0.15em] text-white/40 mb-3">REDES</div>
+              <ul class="flex flex-col">
+                <li class="border-t border-white/10">
+                  <a href="#" class="group flex items-center justify-between py-3.5 text-sm text-white/70 hover:text-white transition-colors duration-300">
+                    GitHub <span class="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
+                  </a>
+                </li>
+                <li class="border-t border-b border-white/10">
+                  <a href="#" class="group flex items-center justify-between py-3.5 text-sm text-white/70 hover:text-white transition-colors duration-300">
+                    LinkedIn <span class="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="px-6 md:px-12 py-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <p class="font-mono text-[10px] tracking-[0.1em] text-white/30 text-center sm:text-left">
+      © 2026 ADAEL VEGA — INGENIERÍA EN SISTEMAS · PYTHON &amp; SCRIPTING.
+    </p>
+    <button id="to-top" aria-label="Volver arriba" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center text-white/60 hover:text-white hover:border-white transition-all duration-500 opacity-0 pointer-events-none">
+      ↑
+    </button>
+  </footer>
+
+  <script>
+    // ================= PRELOADER =================
+    (function(){
+      const preloader = document.getElementById('preloader');
+      const percentEl = document.getElementById('loader-percent');
+      const barFill   = document.getElementById('loader-bar-fill');
+      const statusEl  = document.getElementById('loader-status');
+      const messages  = ['Inicializando entorno...', 'Compilando componentes...', 'Optimizando estilos...', 'Renderizando interfaz...', 'Listo.'];
+      const thresholds = [18, 42, 68, 92];
+
+      let progress = 0;
+      let fired = 0;
+      document.body.style.overflow = 'hidden';
+
+      function setStatus(i){
+        statusEl.style.opacity = 0;
+        setTimeout(() => {
+          statusEl.textContent = messages[i];
+          statusEl.style.opacity = 1;
+        }, 200);
+      }
+
+      function tick(){
+        if (progress < 100){
+          const inc = progress < 75 ? (Math.random() * 4 + 1) : (Math.random() * 1.5 + 0.2);
+          progress = Math.min(100, progress + inc);
+          const floor = Math.floor(progress);
+          percentEl.textContent = floor + '%';
+          barFill.style.width = progress + '%';
+          if (fired < thresholds.length && progress >= thresholds[fired]){
+            fired++;
+            setStatus(fired);
+          }
+          requestAnimationFrame(tick);
+        } else {
+          percentEl.textContent = '100%';
+          barFill.style.width = '100%';
+          setStatus(4);
+          setTimeout(() => {
+            preloader.classList.add('loaded');
+            document.body.style.overflow = '';
+            setTimeout(() => { preloader.style.display = 'none'; }, 950);
+          }, 450);
+        }
+      }
+      requestAnimationFrame(tick);
+    })();
+
+    // ================= REVEAL ON SCROLL =================
+    (function(){
+      const els = document.querySelectorAll('.reveal');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting){
+            const delay = entry.target.dataset.delay || 0;
+            entry.target.style.transitionDelay = delay + 'ms';
+            entry.target.classList.add('in-view');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(el => io.observe(el));
+    })();
+
+    // ================= NAV ACTIVE LINK =================
+    (function(){
+      const sections = document.querySelectorAll('main section[id]');
+      const links = document.querySelectorAll('.nav-link');
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting){
+            links.forEach(l => l.classList.remove('active'));
+            const active = document.querySelector('.nav-link[href="#' + entry.target.id + '"]');
+            if (active) active.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-45% 0px -45% 0px' });
+      sections.forEach(s => obs.observe(s));
+    })();
+
+    // ================= CUSTOM CURSOR + SPOTLIGHT =================
+    (function(){
+      const spotlight = document.getElementById('spotlight');
+      const isFine = window.matchMedia('(pointer: fine)').matches;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!isFine || reduced){
+        spotlight.style.display = 'none';
+        document.getElementById('cursor-dot').style.display = 'none';
+        document.getElementById('cursor-ring').style.display = 'none';
+        return;
+      }
+
+      document.documentElement.classList.add('has-cursor');
+      const dot = document.getElementById('cursor-dot');
+      const ring = document.getElementById('cursor-ring');
+      let tx = window.innerWidth / 2, ty = window.innerHeight / 2, rx = tx, ry = ty;
+
+      window.addEventListener('mousemove', (e) => {
+        tx = e.clientX; ty = e.clientY;
+        dot.style.left = tx + 'px'; dot.style.top = ty + 'px';
+        spotlight.style.setProperty('--mx', tx + 'px');
+        spotlight.style.setProperty('--my', ty + 'px');
+      });
+
+      function animateRing(){
+        rx += (tx - rx) * 0.18;
+        ry += (ty - ry) * 0.18;
+        ring.style.left = rx + 'px';
+        ring.style.top = ry + 'px';
+        requestAnimationFrame(animateRing);
+      }
+      animateRing();
+
+      document.querySelectorAll('a, button, input, textarea').forEach(el => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+      });
+    })();
+
+    // ================= BACK TO TOP =================
+    (function(){
+      const btn = document.getElementById('to-top');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > window.innerHeight * 0.7){
+          btn.classList.remove('opacity-0', 'pointer-events-none');
+        } else {
+          btn.classList.add('opacity-0', 'pointer-events-none');
+        }
+      });
+      btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    })();
+
+    // ================= CONTACT FORM =================
+    (function(){
+      const form = document.getElementById('contact-form');
+      const btn = document.getElementById('submit-btn');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!form.checkValidity()){ form.reportValidity(); return; }
+
+        const payload = {
+          name: form.name.value.trim(),
+          email: form.email.value.trim(),
+          message: form.message.value.trim()
+        };
+
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+
+        try {
+          const res = await fetch('/api/send-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) throw new Error('Falló el envío');
+
+          btn.textContent = 'Mensaje enviado ✓';
+          form.reset();
+        } catch (err) {
+          console.error(err);
+          btn.textContent = 'Error al enviar ✕';
+        } finally {
+          setTimeout(() => {
+            btn.innerHTML = 'Enviar mensaje <span aria-hidden="true">↗</span>';
+            btn.disabled = false;
+          }, 2400);
+        }
+      });
+    })();
+
+    // ================= TERMINAL WIDGET =================
+    (function(){
+      const body  = document.getElementById('terminal-body');
+      const input = document.getElementById('terminal-input');
+      if (!body || !input) return;
+
+      const history = [];
+      let historyIndex = -1;
+
+      const commands = {
+        help: () => [
+          'Comandos disponibles:',
+          '  whoami   — biografía breve',
+          '  skills   — nivel y áreas de especialización',
+          '  stack    — herramientas del día a día',
+          '  contact  — datos de contacto',
+          '  clear    — limpiar la pantalla'
+        ].join('\n'),
+
+        whoami: () => [
+          'Adael Vega',
+          'Estudiante de Ingeniería en Sistemas | Python & Scripting.',
+          'Apasionado por la automatización de procesos, el desarrollo de scripts en Python,',
+          'la administración de sistemas y el análisis de infraestructura de redes.'
+        ].join('\n'),
+
+        skills: () => [
+          'Nivel y áreas de especialización:',
+          '  → Python        — Nivel intermedio, orientado a automatización',
+          '  → Linux         — Administración de sistemas y scripting en Bash',
+          '  → PowerShell    — Automatización de tareas en entornos Windows',
+          '  → Redes         — Protocolos de comunicación y análisis de infraestructura'
+        ].join('\n'),
+
+        stack: () => [
+          'Herramientas del día a día:',
+          '  Python · Linux · PowerShell · Git'
+        ].join('\n'),
+
+        contact: () => [
+          'Vías de contacto:',
+          '  Email     adael.vega@example.com',
+          '  GitHub    github.com/ (próximamente)',
+          '  LinkedIn  linkedin.com/ (próximamente)'
+        ].join('\n'),
+
+        clear: () => { body.innerHTML = ''; return null; }
+      };
+
+      function appendLine(html, cls){
+        const line = document.createElement('div');
+        line.className = 'term-line ' + (cls || 'term-out');
+        line.innerHTML = html;
+        body.appendChild(line);
+        body.scrollTop = body.scrollHeight;
+      }
+
+      function escapeHtml(str){
+        return str.replace(/[&<>"']/g, (c) => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[c]));
+      }
+
+      function runCommand(raw){
+        const cmd = raw.trim();
+        appendLine(
+          '<span class="term-prompt">adael@sistemas</span><span class="term-path">:~$</span> ' + escapeHtml(cmd),
+          'term-out'
+        );
+
+        if (cmd === '') return;
+
+        const key = cmd.toLowerCase();
+        if (Object.prototype.hasOwnProperty.call(commands, key)){
+          const output = commands[key]();
+          if (output) appendLine(escapeHtml(output), 'term-dim');
+        } else {
+          appendLine(escapeHtml("Command not found. Type 'help' for available commands."), 'term-dim');
+        }
+      }
+
+      function intro(){
+        appendLine("Bienvenido a la terminal de Adael Vega. Escribe 'help' para ver los comandos disponibles.", 'term-dim');
+      }
+      intro();
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter'){
+          const val = input.value;
+          if (val.trim() !== ''){
+            history.push(val);
+            historyIndex = history.length;
+          }
+          runCommand(val);
+          input.value = '';
+        } else if (e.key === 'ArrowUp'){
+          if (history.length){
+            historyIndex = Math.max(0, historyIndex - 1);
+            input.value = history[historyIndex] || '';
+            setTimeout(() => input.setSelectionRange(input.value.length, input.value.length), 0);
+          }
+          e.preventDefault();
+        } else if (e.key === 'ArrowDown'){
+          if (history.length){
+            historyIndex = Math.min(history.length, historyIndex + 1);
+            input.value = history[historyIndex] || '';
+          }
+          e.preventDefault();
+        }
+      });
+
+      document.getElementById('terminal-window').addEventListener('click', () => input.focus());
+    })();
+  </script>
+</body>
+</html>
