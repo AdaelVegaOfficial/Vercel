@@ -567,28 +567,45 @@
     })();
 
     // ================= CONTACT FORM =================
-    // Este sitio es un archivo estático (sin backend), así que el envío se simula
-    // en el cliente. Cuando tengas un endpoint real, sustituye el setTimeout por
-    // tu propia llamada fetch('/tu-endpoint', { method:'POST', body: ... }).
+    // Envía el formulario a /api/send-message (función serverless en Vercel),
+    // que reenvía el mensaje a Telegram usando TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID.
     (function(){
       const form = document.getElementById('contact-form');
       const btn = document.getElementById('submit-btn');
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!form.checkValidity()){ form.reportValidity(); return; }
+
+        const payload = {
+          name: form.name.value.trim(),
+          email: form.email.value.trim(),
+          message: form.message.value.trim()
+        };
 
         btn.disabled = true;
         btn.textContent = 'Enviando...';
 
-        setTimeout(() => {
+        try {
+          const res = await fetch('/api/send-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) throw new Error('Falló el envío');
+
           btn.textContent = 'Mensaje enviado ✓';
           form.reset();
+        } catch (err) {
+          console.error(err);
+          btn.textContent = 'Error al enviar ✕';
+        } finally {
           setTimeout(() => {
             btn.innerHTML = 'Enviar mensaje <span aria-hidden="true">↗</span>';
             btn.disabled = false;
           }, 2400);
-        }, 1100);
+        }
       });
     })();
 
