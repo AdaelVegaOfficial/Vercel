@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adael Vega — Estudiante de Ingeniería en Sistemas | Python &amp; Scripting</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='black'/%3E%3Crect x='1' y='1' width='62' height='62' rx='13' fill='none' stroke='white' stroke-opacity='0.35'/%3E%3Ctext x='32' y='42' font-family='Arial, sans-serif' font-weight='800' font-size='24' fill='white' text-anchor='middle'%3EAV%3C/text%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,7 +71,7 @@
   /* ---------- preloader ---------- */
   #preloader{
     position:fixed; inset:0; background:#000; z-index:10000;
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.75rem;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.25rem;
     transition: transform .9s cubic-bezier(.76,0,.24,1), opacity .9s cubic-bezier(.76,0,.24,1);
   }
   #preloader.loaded{ transform:translateY(-100%); opacity:0.5; pointer-events:none; }
@@ -98,6 +99,15 @@
   .caret{ display:inline-block; width:.46em; background:#fff; margin-left:.08em; animation:blink 1s steps(1) infinite; }
   @keyframes blink{ 50%{ opacity:0; } }
 
+  /* ---------- logo ---------- */
+  .logo-mark{
+    display:inline-flex; align-items:center; justify-content:center;
+    transition:transform .4s cubic-bezier(.16,1,.3,1);
+  }
+  .logo-mark:hover{ transform:scale(1.07) rotate(-3deg); }
+  .logo-mark svg rect{ transition:stroke-opacity .4s ease; }
+  .logo-mark:hover svg rect{ stroke-opacity:.9; }
+
   /* ---------- nav ---------- */
   .nav-link{ position:relative; }
   .nav-link::after{
@@ -114,14 +124,6 @@
   }
   .btn-fill:hover::before{ transform:scaleX(1); }
   .btn-fill:hover{ color:#000; }
-
-  .btn-outline{ position:relative; z-index:0; overflow:hidden; }
-  .btn-outline::before{
-    content:''; position:absolute; inset:0; background:#fff; transform:scaleX(0); transform-origin:left;
-    transition:transform .5s cubic-bezier(.76,0,.24,1); z-index:-1;
-  }
-  .btn-outline:hover::before{ transform:scaleX(1); }
-  .btn-outline:hover{ color:#000; }
 
   /* ---------- marquee ---------- */
   .marquee{ overflow:hidden; }
@@ -140,18 +142,6 @@
   }
   @keyframes pulse{ 0%{ transform:scale(1); opacity:.6; } 100%{ transform:scale(2.6); opacity:0; } }
 
-  /* ---------- terminal pixel blink ---------- */
-  .pixel{ animation:pixelPulse 3.2s ease-in-out infinite; animation-delay:calc(var(--i) * .12s); }
-  @keyframes pixelPulse{ 0%,100%{ opacity:.08; } 50%{ opacity:.55; } }
-
-  /* ---------- form inputs ---------- */
-  .field-input{
-    background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,.2);
-    padding:.75rem .1rem; width:100%; color:#fff; transition:border-color .4s ease;
-  }
-  .field-input::placeholder{ color:rgba(255,255,255,.35); }
-  .field-input:focus{ outline:none; border-color:#fff; }
-
   /* ---------- bento cards ---------- */
   .bento-card{
     border:1px solid rgba(255,255,255,.1);
@@ -161,6 +151,14 @@
   }
   .bento-card:hover{ border-color:rgba(255,255,255,.28); background:rgba(255,255,255,.04); transform:translateY(-3px); }
 
+  /* ---------- form inputs ---------- */
+  .field-input{
+    background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,.2);
+    padding:.75rem .1rem; width:100%; color:#fff; transition:border-color .4s ease;
+  }
+  .field-input::placeholder{ color:rgba(255,255,255,.35); }
+  .field-input:focus{ outline:none; border-color:#fff; }
+
   /* ---------- terminal widget ---------- */
   #terminal-window{
     background:#0a0a0a;
@@ -169,15 +167,9 @@
     font-family:'JetBrains Mono', monospace;
     box-shadow: 0 30px 80px -20px rgba(0,0,0,.9);
   }
-  #terminal-titlebar{
-    border-bottom:1px solid #ffffff14;
-  }
+  #terminal-titlebar{ border-bottom:1px solid #ffffff14; }
   .term-dot{ width:10px; height:10px; border-radius:50%; border:1px solid #ffffff33; }
-  #terminal-body{
-    height:min(60vh, 420px);
-    overflow-y:auto;
-    scrollbar-width:thin;
-  }
+  #terminal-body{ height:min(60vh, 420px); overflow-y:auto; scrollbar-width:thin; }
   #terminal-body::-webkit-scrollbar{ width:6px; }
   #terminal-body::-webkit-scrollbar-thumb{ background:#2a2a2a; border-radius:3px; }
   .term-line{ white-space:pre-wrap; word-break:break-word; line-height:1.65; }
@@ -185,10 +177,6 @@
   .term-path{ color:#ffffff80; }
   .term-out{ color:#ffffffb3; }
   .term-dim{ color:#ffffff55; }
-  .term-cursor{
-    display:inline-block; width:.55em; height:1.1em; background:#fff; vertical-align:text-bottom;
-    animation:blink 1s steps(1) infinite; margin-left:2px;
-  }
   #terminal-input{
     background:transparent; border:none; outline:none; color:#fff; caret-color:#fff;
     font-family:'JetBrains Mono', monospace; width:100%;
@@ -200,7 +188,11 @@
 
   <!-- ================= PRELOADER ================= -->
   <div id="preloader">
-    <div class="font-mono text-[11px] tracking-[0.3em] text-white/40">AV — SISTEMA DE CARGA</div>
+    <svg width="34" height="34" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-2 opacity-90">
+      <rect x="1" y="1" width="34" height="34" rx="10" stroke="white" stroke-opacity="0.5"/>
+      <text x="18" y="23.5" text-anchor="middle" font-family="Syne, sans-serif" font-weight="800" font-size="13" letter-spacing="0.5" fill="white">AV</text>
+    </svg>
+    <div class="font-mono text-[11px] tracking-[0.3em] text-white/40">SISTEMA DE CARGA</div>
     <div id="loader-percent" class="loader-percent">0%</div>
     <div class="loader-bar-track"><div id="loader-bar-fill" class="loader-bar-fill"></div></div>
     <div id="loader-status" class="loader-status">Inicializando entorno...</div>
@@ -213,8 +205,11 @@
 
   <!-- ================= NAV ================= -->
   <header class="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-5 md:px-10 py-5 md:py-6 pointer-events-none">
-    <a href="#home" class="pointer-events-auto font-display font-bold text-base md:text-lg tracking-tight">
-      AV<span class="text-white/30">.</span>
+    <a href="#home" class="pointer-events-auto logo-mark" aria-label="Adael Vega — inicio">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="34" height="34" rx="10" stroke="white" stroke-opacity="0.4"/>
+        <text x="18" y="23.5" text-anchor="middle" font-family="Syne, sans-serif" font-weight="800" font-size="13" letter-spacing="0.5" fill="white">AV</text>
+      </svg>
     </a>
 
     <nav class="pointer-events-auto absolute left-1/2 -translate-x-1/2 top-4 md:top-6 flex items-center gap-5 md:gap-10 bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-full px-5 md:px-8 py-2.5 md:py-3">
@@ -323,11 +318,11 @@
           <!-- quote -->
           <div class="reveal bento-card rounded-2xl p-7 flex items-center">
             <p class="font-display font-semibold text-white/80 text-base leading-snug">
-              “Un buen script no ejecuta una tarea: la elimina para siempre.”
+              "Un buen script no ejecuta una tarea: la elimina para siempre."
             </p>
           </div>
 
-          <!-- stack técnico / terminal stack -->
+          <!-- stack técnico -->
           <div class="reveal bento-card md:col-span-2 rounded-2xl p-7">
             <div class="font-mono text-[10px] tracking-[0.15em] text-white/40 mb-4">TERMINAL STACK</div>
             <div class="flex flex-wrap gap-2 font-mono">
@@ -402,7 +397,7 @@
           <div class="reveal md:col-span-2 flex flex-col justify-between gap-12">
             <div>
               <div class="font-mono text-[10px] tracking-[0.15em] text-white/40 mb-3">CONTACTO DIRECTO</div>
-              <a href="mailto:AdaelVegaOfficial@Gmail.com" class="font-display font-semibold text-xl md:text-2xl hover:text-white/60 transition-colors duration-300 break-all">adael.vega@example.com</a>
+              <a href="mailto:AdaelVegaOfficial@Gmail.com" class="font-display font-semibold text-xl md:text-2xl hover:text-white/60 transition-colors duration-300 break-all">AdaelVegaOfficial@Gmail.com</a>
               <p class="text-white/40 text-sm mt-3">Estudiante de Ingeniería en Sistemas · Disponible para prácticas y colaboraciones</p>
             </div>
 
@@ -572,43 +567,28 @@
     })();
 
     // ================= CONTACT FORM =================
+    // Este sitio es un archivo estático (sin backend), así que el envío se simula
+    // en el cliente. Cuando tengas un endpoint real, sustituye el setTimeout por
+    // tu propia llamada fetch('/tu-endpoint', { method:'POST', body: ... }).
     (function(){
       const form = document.getElementById('contact-form');
       const btn = document.getElementById('submit-btn');
 
-      form.addEventListener('submit', async (e) => {
+      form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (!form.checkValidity()){ form.reportValidity(); return; }
-
-        const payload = {
-          name: form.name.value.trim(),
-          email: form.email.value.trim(),
-          message: form.message.value.trim()
-        };
 
         btn.disabled = true;
         btn.textContent = 'Enviando...';
 
-        try {
-          const res = await fetch('/api/send-message', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-
-          if (!res.ok) throw new Error('Falló el envío');
-
+        setTimeout(() => {
           btn.textContent = 'Mensaje enviado ✓';
           form.reset();
-        } catch (err) {
-          console.error(err);
-          btn.textContent = 'Error al enviar ✕';
-        } finally {
           setTimeout(() => {
             btn.innerHTML = 'Enviar mensaje <span aria-hidden="true">↗</span>';
             btn.disabled = false;
           }, 2400);
-        }
+        }, 1100);
       });
     })();
 
@@ -653,7 +633,7 @@
 
         contact: () => [
           'Vías de contacto:',
-          '  Email     adael.vega@example.com',
+          '  Email     AdaelVegaOfficial@Gmail.com',
           '  GitHub    github.com/ (próximamente)',
           '  LinkedIn  linkedin.com/ (próximamente)'
         ].join('\n'),
